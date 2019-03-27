@@ -30,6 +30,17 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
     private CharacterController charController;
     private Vector3 moveDirection = Vector3.zero;
 
+    //to test which layer you are currently on
+    public LayerMask groundLayer;
+    //calculate how far you're from the ground
+    private float rayDistance;
+
+    private float default_ControllerHeight;
+
+    private Vector3 default_camPos;
+
+    private float camHeight;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -45,13 +56,19 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
 
         charController = GetComponent<CharacterController>();
         is_Moving = false;
+        //determines if the player is crouching if height is half
+        rayDistance = charController.height * 0.5f + charController.radius;
+
+        default_ControllerHeight = charController.height;
+        //fps view in scene 
+        default_camPos = firstPerson_View.localPosition;
     }
 
 
     // Update is called once per frame
     void Update()
     {
-        playerMovement();
+        PlayerMovement();
     }
 
 
@@ -60,7 +77,7 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
     /// This function determines what direction the player wants to move in based on 
     /// the allowed set of key presses W,A,S,D 
     /// </summary>
-    void playerMovement()
+    void PlayerMovement()
     {
         //if w or s pressed the player has decided to move forward if W and backward if S 
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S))
@@ -123,12 +140,17 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
         // if the player is on the ground 
         if (is_Grounded)
         {
+            PlayerCrouchingAndSprinting();
+
             moveDirection = new Vector3(inputX * inputModifyFactor, // x-axis movement
                                                        -antiBumpFactor, //for smoother character animation if we bump into objects
                                                            inputY * inputModifyFactor); // y-axis movement
 
             //to make sure we're using local co-ordinates and not world co-ordinates 
             moveDirection = transform.TransformDirection(moveDirection) * speed;
+
+            //player decides to jump
+            PlayerJump();
         }
         //applying gravity to the game object 
         //since gravity is supposed to be pulling you to the ground the negative value is assigned to make sure the 
@@ -142,6 +164,122 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
         //and we're actually moving and not just reacting to something in the world
         is_Moving = charController.velocity.magnitude > 0.15f;
 
+    }
+
+
+    //if player is not crouched and presses 'C' crouch and if can stand again or is no longer pressing c, stand upright again.
+    void PlayerCrouchingAndSprinting()
+    { 
+        if(Input.GetKey(KeyCode.C))
+        {
+            //set to crouching since button was pressed 
+            if(!is_Crouching)
+            {
+                is_Crouching = true;
+            }
+            else
+            {
+                if(CanGetUp())
+                {
+                    is_Crouching = false;
+                }
+            }
+
+            StopCoroutine(MoveCameraCrouch());
+            StartCoroutine(MoveCameraCrouch());
+
+
+        }
+        //setting movment speed based on standing position of character 
+        if(is_Crouching)
+        {
+            //reduced speed for moving while crouched 
+            speed = crouchSpeed;
+        }
+        else
+        {
+            //if sprint key is held down we want the player to sprint
+            if(Input.GetKey(KeyCode.LeftShift))
+            {
+                speed = runSpeed;
+            }
+            else //normal walk speed otherwise
+             speed = walkSpeed;
+        }
+    }
+
+
+    bool CanGetUp()
+    {
+        //where we are casting the ray from 
+        Ray groundRay = new Ray(transform.position, transform.up);
+        //where we are going to be casting to 
+
+        //out groundHit is the information recieved when ray cast is done 
+        //@groundRay - source ray 
+        //@charController.radius - radius of the sphere we're going to be casting on
+        //@params rayDistance - max distance of ray cast 
+        //@params groundLayer - test with which layers we are colliding.
+        //@params groundHit - will store the information returned and tell us if we're touching the layer specified or not
+        if (Physics.SphereCast(groundRay, charController.radius + 0.05f, out RaycastHit groundHit, rayDistance, groundLayer))
+        {
+            //@groundHit.point is the exact point where the sphere and the ground layers collide
+            if (Vector3.Distance(transform.position, groundHit.point) < 2.3f)
+            {
+                //since we haven't actually completed the motion yet we will return false 
+                return false;
+            }
+        }
+
+        //once completely crouched you can get up again.
+        return true;
+    }
+
+    IEnumerator MoveCameraCrouch()
+    {
+        //if player is crouching set lower the height to make them crouch 
+        charController.height = is_Crouching ? default_ControllerHeight / 1.5f : default_ControllerHeight;
+        charController.center = new Vector3(0f, charController.height / 2f, 0f);
+
+        //if person is crouching we set the cam height to crouch level 
+        camHeight = is_Crouching ? default_camPos.y / 1.5f : default_camPos.y;
+
+        //keep checking if the person is stil crouching and update local view
+        while(Mathf.Abs(camHeight - firstPerson_View.localPosition.y)>0.01f)
+        {
+            // lerping between local and updated position for croucuching view
+            firstPerson_View.localPosition = Vector3.Lerp(firstPerson_View.localPosition,
+                                        new Vector3(default_camPos.x, camHeight, default_camPos.z), Time.deltaTime * 11f);
+
+            yield return null;
+        }
+
+    }
+
+    //method to handle player jumping
+    //if player is crouched stand up
+    //else player will jump
+    void PlayerJump()
+    {
+        if(Input.GetKey(KeyCode.Space))
+        {
+            if(is_Crouching)
+            {
+                if(CanGetUp())
+                {
+                    is_Crouching = false;
+
+
+                    StopCoroutine(MoveCameraCrouch());
+                    StartCoroutine(MoveCameraCrouch());
+                }
+
+            }
+            else
+            {
+                moveDirection.y = jumpSpeed;
+            }
+        }
     }
 }
 
