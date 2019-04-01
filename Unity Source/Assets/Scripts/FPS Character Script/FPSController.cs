@@ -41,6 +41,9 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
 
     private float camHeight;
 
+    //controller for animations 
+    FPSPlayerAnimations playerAnimation;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -62,6 +65,8 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
         default_ControllerHeight = charController.height;
         //fps view in scene 
         default_camPos = firstPerson_View.localPosition;
+        //get reference to player animation
+        playerAnimation = GetComponent<FPSPlayerAnimations>();
     }
 
 
@@ -163,6 +168,8 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
         //the magnitude is set at .15 to make sure we have caught some momentum 
         //and we're actually moving and not just reacting to something in the world
         is_Moving = charController.velocity.magnitude > 0.15f;
+        //the handle animations function will then update the animation of the player in the scene 
+        HandleAnimations(); 
 
     }
 
@@ -206,6 +213,8 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
             else //normal walk speed otherwise
              speed = walkSpeed;
         }
+        //adjust player to crouch using animations 
+        playerAnimation.PlayerCrouch(is_Crouching);
     }
 
 
@@ -268,7 +277,7 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
                 if(CanGetUp())
                 {
                     is_Crouching = false;
-
+                    playerAnimation.PlayerCrouch(is_Crouching);
 
                     StopCoroutine(MoveCameraCrouch());
                     StartCoroutine(MoveCameraCrouch());
@@ -279,6 +288,22 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
             {
                 moveDirection.y = jumpSpeed;
             }
+        }
+    }
+
+    /// <summary>
+    /// Handles the animations in the game object.
+    /// </summary>
+    void HandleAnimations()
+    {
+        playerAnimation.Movement(charController.velocity.magnitude);
+        playerAnimation.PlayerJump(charController.velocity.y);
+
+        //handle crouching animation
+        if(is_Crouching && charController.velocity.magnitude> 0f)
+        {
+            playerAnimation.PlayerCrouchWalk(charController.velocity.magnitude);
+
         }
     }
 }

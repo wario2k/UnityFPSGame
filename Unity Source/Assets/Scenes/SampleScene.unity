@@ -213,7 +213,7 @@ GameObject:
   - component: {fileID: 1535636689}
   - component: {fileID: 1535636688}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -285,7 +285,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1535636687}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.032865, y: 0.7118325, z: -1.2781057}
+  m_LocalPosition: {x: 1, y: 0.73, z: -1.2781057}
   m_LocalScale: {x: 50, y: 0.1, z: 50}
   m_Children: []
   m_Father: {fileID: 0}
@@ -314,6 +314,9 @@ MonoBehaviour:
   crouchSpeed: 4
   jumpSpeed: 8
   gravity: 15
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!114 &4824756736938575191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -327,6 +330,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   axes: 0
+--- !u!114 &4824756736938575192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4824756736938575186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df2f1d86a303243fe9bf6c663b989e03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8743297161313764177
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -343,6 +358,10 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 534669902, guid: 9d5c2d320a3334162bb14f049d10fd4b, type: 3}
+      propertyPath: m_Name
+      value: FPS Camera
       objectReference: {fileID: 0}
     - target: {fileID: 8876988051098593912, guid: 9d5c2d320a3334162bb14f049d10fd4b,
         type: 3}
@@ -404,9 +423,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 534669902, guid: 9d5c2d320a3334162bb14f049d10fd4b, type: 3}
-      propertyPath: m_Name
-      value: FPS Camera
-      objectReference: {fileID: 0}
+    - target: {fileID: 4637059522957010781, guid: 9d5c2d320a3334162bb14f049d10fd4b,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 7d338558dc9a34c93bf83eea56ae0c32, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9d5c2d320a3334162bb14f049d10fd4b, type: 3}
