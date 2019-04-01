@@ -44,6 +44,17 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
     //controller for animations 
     FPSPlayerAnimations playerAnimation;
 
+
+    //reference for weapons 
+    [SerializeField]
+    private WeaponManager weapon_Manager;
+    //reference to the current weapon held
+    private FPSWeapon current_Weapon;
+
+    //controls for regulating rate of fire for weapons 
+    private float fireRate = 15f;
+    private float nextTimeToFire = 0f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -67,6 +78,11 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
         default_camPos = firstPerson_View.localPosition;
         //get reference to player animation
         playerAnimation = GetComponent<FPSPlayerAnimations>();
+
+        //activate whatever weapon is being carried 
+        weapon_Manager.weapons[0].SetActive(true);
+        //attach the component and get reference to the script to activate it 
+        current_Weapon = weapon_Manager.weapons[0].GetComponent<FPSWeapon>();
     }
 
 
@@ -304,6 +320,30 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
         {
             playerAnimation.PlayerCrouchWalk(charController.velocity.magnitude);
 
+        }
+
+        //handle shooting
+        if(Input.GetMouseButtonDown(0) && Time.time > nextTimeToFire) //if right mb click and time since click is greater than next time to fire interval
+        {
+            nextTimeToFire = Time.time + 1f / fireRate;
+            //if is crouching trigger crouch fire else standing fire 
+            if(is_Crouching)
+            {
+                playerAnimation.Shoot(false);
+            }
+            else
+            {
+                playerAnimation.Shoot(true);
+            }
+            //activate muzzle flash
+            current_Weapon.Shoot();
+
+
+        }
+
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            playerAnimation.ReloadGun();
         }
     }
 }

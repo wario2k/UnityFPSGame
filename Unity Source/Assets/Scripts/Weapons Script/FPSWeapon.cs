@@ -1,16 +1,32 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * 
+ * */
 public class FPSWeapon : MonoBehaviour
 {
+    private const string MUZZLE_FLASH = "Muzzle Flash";
+    public GameObject muzzleFlash;
 
-    private GameObject muzzleFlash;
-    // Start is called before the first frame update
-    void Awake()
+    GameObject item;
+    Transform tmp; 
+
+ 
+// Start is called before the first frame update
+void Awake()
     {
         //tries to find it in the scene and attach it 
-        muzzleFlash = transform.Find("Muzzle Flash").gameObject;
+        item = transform.Find(MUZZLE_FLASH).gameObject;
+        if(item == null)
+        {
+            Debug.Log("Could not find the object");
+        }
+        else
+        {
+            muzzleFlash = item;
+        }
+        muzzleFlash.SetActive(false);
     }
 
     // Called when the gun is fired to activate muzzle flash 
