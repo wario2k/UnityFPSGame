@@ -55,6 +55,10 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
     private float fireRate = 15f;
     private float nextTimeToFire = 0f;
 
+    [SerializeField] //reference for player layer weapons
+    private WeaponManager handsWeapon_Manager;
+    private FPSHandsWeapon current_Hands_Weapon;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -83,6 +87,14 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
         weapon_Manager.weapons[0].SetActive(true);
         //attach the component and get reference to the script to activate it 
         current_Weapon = weapon_Manager.weapons[0].GetComponent<FPSWeapon>();
+
+        //getting player layer to get correct models in scene
+        //activate first weapon
+        handsWeapon_Manager.weapons[0].SetActive(true);
+
+        //get reference to the active weapon's scripts
+        current_Hands_Weapon = handsWeapon_Manager.weapons[0].GetComponent<FPSHandsWeapon>();
+
     }
 
 
@@ -338,13 +350,39 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
             }
             //activate muzzle flash
             current_Weapon.Shoot();
+            //activate shooting animation for player layer
+            current_Hands_Weapon.Shoot();
 
 
         }
-
+        //if playre hits "R" activate reload motion
         if(Input.GetKeyDown(KeyCode.R))
         {
+            //play animations on game object
             playerAnimation.ReloadGun();
+            //activate the animation for player layer
+            current_Hands_Weapon.Reload();
+        }
+    }
+
+    /// <summary>
+    /// Activates the weapon in the player layer.
+    /// </summary>
+    /// <param name="index">Index of weapon to activate</param>
+    void activatePlayerLayerWeapon(int index)
+    {
+        //if weapon isn't already selected, deactivates all other weapons in model and sets the selected weapon as active 
+        if(!handsWeapon_Manager.weapons[index].activeInHierarchy)
+        {
+            for(int i = 0; i < handsWeapon_Manager.weapons.Length; i++)
+            {
+                handsWeapon_Manager.weapons[i].SetActive(false);
+            }
+            current_Hands_Weapon = null;
+            handsWeapon_Manager.weapons[index].SetActive(true);
+
+            current_Hands_Weapon = handsWeapon_Manager.weapons[index].GetComponent<FPSHandsWeapon>();
+
         }
     }
 
@@ -353,9 +391,12 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
     /// </summary>
     void SelectWeapon()
     {
+
+
         //if player selects 1 select pistol
         if(Input.GetKeyDown(KeyCode.Alpha1))
         {
+            activatePlayerLayerWeapon(0);
             if(!weapon_Manager.weapons[0].activeInHierarchy) //if the weapons is not already active
             {
                 //deactivate all other weapons from the scene
@@ -376,6 +417,7 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
         //player hits 2
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
+            activatePlayerLayerWeapon(1);
             if (!weapon_Manager.weapons[1].activeInHierarchy) //if the weapons is not already active
             {
                 //deactivate all other weapons from the scene
@@ -397,6 +439,7 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
         //player hits 3 
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
+            activatePlayerLayerWeapon(2);
             if (!weapon_Manager.weapons[2].activeInHierarchy) //if the weapons is not already active
             {
                 //deactivate all other weapons from the scene
