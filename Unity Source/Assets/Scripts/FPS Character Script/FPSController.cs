@@ -90,6 +90,7 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
     void Update()
     {
         PlayerMovement();
+        SelectWeapon();
     }
 
 
@@ -345,6 +346,75 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
         {
             playerAnimation.ReloadGun();
         }
+    }
+
+    /// <summary>
+    /// This function will handle changing weapons any time the player decides
+    /// </summary>
+    void SelectWeapon()
+    {
+        //if player selects 1 select pistol
+        if(Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            if(!weapon_Manager.weapons[0].activeInHierarchy) //if the weapons is not already active
+            {
+                //deactivate all other weapons from the scene
+                for(int i = 0; i< weapon_Manager.weapons.Length; i++)
+                {
+                    weapon_Manager.weapons[i].SetActive(false);
+                }
+                current_Weapon = null;
+                weapon_Manager.weapons[0].SetActive(true);
+                //get reference to the new current weapon
+                current_Weapon = weapon_Manager.weapons[0].GetComponent<FPSWeapon>();
+                //change animation to use pistol stance 
+                //expects @isPistol - bool
+                playerAnimation.ChangeController(true);
+            }
+        }
+
+        //player hits 2
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            if (!weapon_Manager.weapons[1].activeInHierarchy) //if the weapons is not already active
+            {
+                //deactivate all other weapons from the scene
+                for (int i = 0; i < weapon_Manager.weapons.Length; i++)
+                {
+                    weapon_Manager.weapons[i].SetActive(false);
+                }
+                current_Weapon = null;
+                weapon_Manager.weapons[1].SetActive(true);
+                //get reference to the new current weapon
+                current_Weapon = weapon_Manager.weapons[1].GetComponent<FPSWeapon>();
+                //change animation to use pistol stance 
+                //expects @isPistol - bool
+                //passing false since this gun is not a pistol
+                playerAnimation.ChangeController(false);
+            }
+        }
+
+        //player hits 3 
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            if (!weapon_Manager.weapons[2].activeInHierarchy) //if the weapons is not already active
+            {
+                //deactivate all other weapons from the scene
+                for (int i = 0; i < weapon_Manager.weapons.Length; i++)
+                {
+                    weapon_Manager.weapons[i].SetActive(false);
+                }
+                current_Weapon = null;
+                weapon_Manager.weapons[2].SetActive(true);
+                //get reference to the new current weapon
+                current_Weapon = weapon_Manager.weapons[1].GetComponent<FPSWeapon>();
+                //change animation to use pistol stance 
+                //expects @isPistol - bool
+                //passing false since this gun is not a pistol
+                playerAnimation.ChangeController(false);
+            }
+        }
+
     }
 }
 

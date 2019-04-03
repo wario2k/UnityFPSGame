@@ -19,8 +19,11 @@ public class FPSPlayerAnimations : MonoBehaviour
 
     private const string CROUCH_SHOOT = "CrouchShoot";
 
-
     private const string RELOAD = "Reload";
+
+
+    //determines what postion to change player model animation to depending on the type of gun you are holding
+    public RuntimeAnimatorController animController_Pistol, animController_MachineGun;
 
     //caled like start when game is initiated 
     private void Awake()
@@ -90,4 +93,19 @@ public class FPSPlayerAnimations : MonoBehaviour
         anim.SetTrigger(RELOAD); 
     }
 
+    /// <summary>
+    /// Changes the controller based on what gun the player is currently holding
+    /// </summary>
+    /// <param name="isPistol">Determines if the player is holding a pistol.</param>
+    public void ChangeController(bool isPistol)
+    {
+        if(isPistol)
+        {
+            anim.runtimeAnimatorController = animController_Pistol;
+        }
+        else
+        {
+            anim.runtimeAnimatorController = animController_MachineGun;
+        }
+    }
 }

@@ -8,15 +8,13 @@ public class FPSWeapon : MonoBehaviour
 {
     private const string MUZZLE_FLASH = "Muzzle Flash";
     public GameObject muzzleFlash;
-
+    //used to find the game object in the scene
     GameObject item;
-    Transform tmp; 
-
  
 // Start is called before the first frame update
 void Awake()
     {
-        //tries to find it in the scene and attach it 
+        //tries to find the muzzle flash shader in the scene and attach it 
         item = transform.Find(MUZZLE_FLASH).gameObject;
         if(item == null)
         {
@@ -36,6 +34,10 @@ void Awake()
         StartCoroutine(TurnOnMuzzleFlash());
     }
 
+    /// <summary>
+    /// This enumerator finds takes the muzzleFlash game object and briefly turns it on.
+    /// </summary>
+    /// <returns>nothing.</returns>
     IEnumerator TurnOnMuzzleFlash()
     {
         muzzleFlash.SetActive(true);
