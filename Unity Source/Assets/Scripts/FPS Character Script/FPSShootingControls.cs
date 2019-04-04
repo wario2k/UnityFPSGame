@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class FPSShootingControls : MonoBehaviour
 {
-    private Camera mainCamera;
+    private Camera mainCamera; //will get reference to main camera
 
+    //variables to determine rate of fire for the gun player is using
     private float fireRate = 15f;
     private float nextTimeToFire = 0f;
 
@@ -19,6 +20,7 @@ public class FPSShootingControls : MonoBehaviour
     }
 
     // Update is called once per frame
+    //This function will only call shoot since we are using this to update the shooting animations and updating the scene using RayCasting to display hits on objects
     void Update()
     {
         Shoot();
