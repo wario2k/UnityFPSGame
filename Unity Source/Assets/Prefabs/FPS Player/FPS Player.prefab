@@ -1419,6 +1419,8 @@ GameObject:
   - component: {fileID: 4824756736938575188}
   - component: {fileID: 4824756736938575191}
   - component: {fileID: 4824756736938575192}
+  - component: {fileID: 7907891056654796329}
+  - component: {fileID: 6791931431866866605}
   m_Layer: 0
   m_Name: FPS Player
   m_TagString: Untagged
@@ -1531,6 +1533,31 @@ MonoBehaviour:
     type: 2}
   animController_MachineGun: {fileID: 9100000, guid: 0770a54f266a24bc7b5bd0ee2d2b4f0a,
     type: 2}
+--- !u!114 &7907891056654796329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4824756736938575186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da454bc97dc2d4ac3b7f97098af83727, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6791931431866866605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4824756736938575186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fb642b841a0d4110a37207a607937ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  concrete_Impact: {fileID: 100002, guid: 2b4ffdf4a64f87d4ca3c0de925e6d343, type: 3}
 --- !u!1 &5086958945285757921
 GameObject:
   m_ObjectHideFlags: 0
