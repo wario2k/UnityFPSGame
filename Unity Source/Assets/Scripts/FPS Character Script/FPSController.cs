@@ -167,7 +167,12 @@ public class FPSController : NetworkBehaviour //for network controls
         mainCam.gameObject.SetActive(false);
     }
 
+    //only calling this on local player and not run on any other clients
+    public override void OnStartLocalPlayer()
+    {
+        tag = "Player";
 
+    }
     // Update is called once per frame
     void Update()
     {
