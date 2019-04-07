@@ -1,13 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class FPSController : MonoBehaviour
+public class FPSController : NetworkBehaviour //for network controls
 {
     private Transform firstPerson_View;
     private Transform firstPerson_Camera;
 
-private Vector3 firstPerson_View_Rotation = Vector3.zero;
+    private Vector3 firstPerson_View_Rotation = Vector3.zero;
 
     public float walkSpeed = 6.75f;
     public float runSpeed = 10f;
@@ -50,7 +51,11 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
     private WeaponManager weapon_Manager;
     //reference to the current weapon held
     private FPSWeapon current_Weapon;
+    public GameObject playerHolder, weaponsHolder; //for differentiating between local/client player objects
+    public GameObject [] weapons_FPS; //get a reference to all the guns held
 
+    public FPSMouseLook[] mouseLook; //mouse controls for multiple individuals
+    private Camera mainCam;
     //controls for regulating rate of fire for weapons 
     private float fireRate = 15f;
     private float nextTimeToFire = 0f;
@@ -95,14 +100,98 @@ private Vector3 firstPerson_View_Rotation = Vector3.zero;
         //get reference to the active weapon's scripts
         current_Hands_Weapon = handsWeapon_Manager.weapons[0].GetComponent<FPSHandsWeapon>();
 
+        //testing to apply appropriate masking for views
+        if (isLocalPlayer)
+        {
+            //need to check if local player
+            playerHolder.layer = LayerMask.NameToLayer("Player");
+
+            foreach (Transform child in playerHolder.transform)//getting all child objects of the player holder
+            {
+                child.gameObject.layer = LayerMask.NameToLayer("Player");
+            }
+
+            for(int i = 0; i<weapons_FPS.Length; i++)
+            {
+                weapons_FPS[i].layer = LayerMask.NameToLayer("Player");
+            }
+            weaponsHolder.layer = LayerMask.NameToLayer("Enemy");
+
+            foreach(Transform child in weaponsHolder.transform) //getting all child objects of the weapons holder
+            {
+                child.gameObject.layer = LayerMask.NameToLayer("Enemy"); //updating appropriate views
+            }
+
+        }
+
+        //if the palyer is not local 
+        //if player is joining as a remote client we do not want to show them the extra camera layer so that the game seems more natural
+        //update playerHolder layer to enemy layer to hide the fps camera object that contains the extra hands for perspective
+        if (!isLocalPlayer)
+        {
+
+            playerHolder.layer = LayerMask.NameToLayer("Enemy");
+
+            foreach (Transform child in playerHolder.transform)//getting all child objects of the player holder
+            {
+                child.gameObject.layer = LayerMask.NameToLayer("Enemy");
+            }
+
+            for (int i = 0; i < weapons_FPS.Length; i++)
+            {
+                weapons_FPS[i].layer = LayerMask.NameToLayer("Enemy");
+            }
+
+            weaponsHolder.layer = LayerMask.NameToLayer("Player");
+
+            foreach (Transform child in weaponsHolder.transform) //getting all child objects of the weapons holder
+            {
+                child.gameObject.layer = LayerMask.NameToLayer("Player"); //updating appropriate views
+            }
+
+        }
+
+        //update mouse look for local/non-local players
+
+        if(!isLocalPlayer)
+        {
+            for(int i = 0; i < mouseLook.Length; i++)
+            {
+                mouseLook[i].enabled = false;
+
+            }
+        }
+        //getting reference to appropriate camera
+
+        mainCam = mainCam.transform.Find("FPS View").Find("FPS Camera").GetComponent<Camera>();
+        mainCam.gameObject.SetActive(false);
     }
 
 
     // Update is called once per frame
     void Update()
     {
-        PlayerMovement();
-        SelectWeapon();
+        //updating so that local camera perspective is used instead of server player
+        if(isLocalPlayer)
+        {
+            if(!mainCam.gameObject.activeInHierarchy)
+            {
+                mainCam.gameObject.SetActive(true);
+            }
+
+            PlayerMovement();
+
+            SelectWeapon();
+        }
+        //making sure we're only updating for the local player and not activate for other's since we are sharing scripts
+        //if we're not running on our own machine
+        //exit
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
+       
     }
 
 
