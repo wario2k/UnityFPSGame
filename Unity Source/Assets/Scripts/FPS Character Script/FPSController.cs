@@ -163,7 +163,7 @@ public class FPSController : NetworkBehaviour //for network controls
         }
         //getting reference to appropriate camera
 
-        mainCam = mainCam.transform.Find("FPS View").Find("FPS Camera").GetComponent<Camera>();
+        mainCam = transform.Find("FPS View").Find("FPS Camera").GetComponent<Camera>();
         mainCam.gameObject.SetActive(false);
     }
 
@@ -179,9 +179,6 @@ public class FPSController : NetworkBehaviour //for network controls
                 mainCam.gameObject.SetActive(true);
             }
 
-            PlayerMovement();
-
-            SelectWeapon();
         }
         //making sure we're only updating for the local player and not activate for other's since we are sharing scripts
         //if we're not running on our own machine
@@ -191,7 +188,10 @@ public class FPSController : NetworkBehaviour //for network controls
             return;
         }
 
-       
+        PlayerMovement();
+
+        SelectWeapon();
+
     }
 
 

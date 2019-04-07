@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FPSPlayerAnimations : MonoBehaviour
+using UnityEngine.Networking; //for using networkbehavoir
+
+public class FPSPlayerAnimations : NetworkBehaviour
 {
 
     private Animator anim;
@@ -25,11 +27,15 @@ public class FPSPlayerAnimations : MonoBehaviour
     //determines what postion to change player model animation to depending on the type of gun you are holding
     public RuntimeAnimatorController animController_Pistol, animController_MachineGun;
 
+    //required to sync triggers and play animations over the network 
+    private NetworkAnimator networkAnim;
+
     //caled like start when game is initiated 
     private void Awake()
     {
         //getting animator object from the game state
         anim = GetComponent<Animator>();
+        networkAnim = GetComponent<NetworkAnimator>();
 
     }
     /// <summary>
@@ -79,10 +85,16 @@ public class FPSPlayerAnimations : MonoBehaviour
         if(isStanding)
         {
             anim.SetTrigger(STAND_SHOOT);
+
+            //set network trigger
+            networkAnim.SetTrigger(STAND_SHOOT);
         }
         else
         {
             anim.SetTrigger(CROUCH_SHOOT);
+
+            //set network trigger
+            networkAnim.SetTrigger(CROUCH_SHOOT);
         }
     }
     /// <summary>
@@ -90,7 +102,9 @@ public class FPSPlayerAnimations : MonoBehaviour
     /// </summary>
     public void ReloadGun()
     {
-        anim.SetTrigger(RELOAD); 
+        anim.SetTrigger(RELOAD);
+        //set network trigger
+        networkAnim.SetTrigger(RELOAD);
     }
 
     /// <summary>
