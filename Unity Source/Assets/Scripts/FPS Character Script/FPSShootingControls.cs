@@ -15,7 +15,7 @@ public class FPSShootingControls : NetworkBehaviour
     [SerializeField]
     private GameObject concrete_Impact, blood_Impact;
 
-    public float damageAmount = 5f;
+    public float damageAmount = 15f;
     // Start is called before the first frame update
     void Start()
     {
@@ -66,4 +66,11 @@ public class FPSShootingControls : NetworkBehaviour
         obj.GetComponent<PlayerHealth>().TakeDamage(damageAmount);
         Instantiate(blood_Impact, pos, Quaternion.LookRotation(rotation));
     }
+
+    [Command]
+    public void CmdEndGame(string level)
+    {
+        NetworkManager.singleton.ServerChangeScene(level);
+    }
+
 }

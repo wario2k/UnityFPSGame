@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : NetworkBehaviour
 {
     [SyncVar] //syncing player's health using server logic
     public float health = 100f;
+    FPSPlayerAnimations anim;
+    public void Start()
+    {
+        anim = GetComponent<FPSPlayerAnimations>();
+    }
 
-  
     public void TakeDamage(float damage)
     {
         //if object is active on the server
@@ -19,10 +24,14 @@ public class PlayerHealth : NetworkBehaviour
             return;
         }
         health -= damage;
-        print("damage recieved"); 
-        if(health <=0)
+
+        if(health <=1)
         {
-           
+            //playing death scene
+            print("Playing death scene from player health");
+
+            anim.Death();
+            SceneManager.LoadScene("EndScene");
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using UnityEngine.Networking; //for using networkbehavoir
+using UnityEngine.SceneManagement;
 
 public class FPSPlayerAnimations : NetworkBehaviour
 {
@@ -56,6 +57,17 @@ public class FPSPlayerAnimations : NetworkBehaviour
     public void PlayerJump(float velocity)
     {
         anim.SetFloat(VELOCITY_Y, velocity);
+    }
+
+    /// <summary>
+    /// play the animation for player dying.
+    /// </summary>
+    public void Death()
+    {
+        anim.SetTrigger(DEATH);
+        networkAnim.SetTrigger(DEATH);
+        StartCoroutine(LoadEndScene());
+        //call change scene function here
     }
 
     /// <summary>
@@ -123,5 +135,12 @@ public class FPSPlayerAnimations : NetworkBehaviour
         {
             anim.runtimeAnimatorController = animController_MachineGun;
         }
+    }
+
+
+    IEnumerator LoadEndScene()
+    {
+        yield return new WaitForSeconds(3);
+        SceneManager.LoadScene("EndScene");
     }
 }

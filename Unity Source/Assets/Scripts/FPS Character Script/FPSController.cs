@@ -54,6 +54,8 @@ public class FPSController : NetworkBehaviour //for network controls
 
     public Renderer playerRenderer;
 
+    private PlayerHealth playerHealth;
+
     //reference for weapons 
     [SerializeField]
     private WeaponManager weapon_Manager;
@@ -75,6 +77,8 @@ public class FPSController : NetworkBehaviour //for network controls
     // Start is called before the first frame update
     void Start()
     {
+        playerHealth = GetComponent<PlayerHealth>(); //get health component
+
         //since player will be in an upright position when starting so normal walk speed is applied
         speed = walkSpeed;
 
@@ -438,6 +442,23 @@ public class FPSController : NetworkBehaviour //for network controls
     /// </summary>
     void HandleAnimations()
     {
+        if(playerHealth.health <= 1)
+        {
+            //handle death animation here
+            print("Playing death scene");
+            playerAnimation.Death();
+            
+#pragma warning disable CS0618 
+            NetworkManager.singleton.ServerChangeScene("EndScene");
+
+            //destroy player from game
+            Destroy(playerHolder, 1f);
+            Destroy(weaponsHolder, 1f);
+
+          
+
+
+        }
         playerAnimation.Movement(charController.velocity.magnitude);
         playerAnimation.PlayerJump(charController.velocity.y);
 
