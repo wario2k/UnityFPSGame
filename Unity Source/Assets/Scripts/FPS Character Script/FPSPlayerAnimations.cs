@@ -23,6 +23,8 @@ public class FPSPlayerAnimations : NetworkBehaviour
 
     private const string RELOAD = "Reload";
 
+    private const string DEATH = "Death";
+
 
     //determines what postion to change player model animation to depending on the type of gun you are holding
     public RuntimeAnimatorController animController_Pistol, animController_MachineGun;

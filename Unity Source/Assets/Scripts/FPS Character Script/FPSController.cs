@@ -45,6 +45,14 @@ public class FPSController : NetworkBehaviour //for network controls
     //controller for animations 
     FPSPlayerAnimations playerAnimation;
 
+    //color vars to render player models in different colors 
+    private Color[] playerColors = {
+                                                    new Color(0,44,255,255), //blue
+                                                    new Color(252,208,193,255), //red
+                                                    new Color(0,0,0,255) //black
+                                                    };
+
+    public Renderer playerRenderer;
 
     //reference for weapons 
     [SerializeField]
@@ -165,7 +173,18 @@ public class FPSController : NetworkBehaviour //for network controls
 
         mainCam = transform.Find("FPS View").Find("FPS Camera").GetComponent<Camera>();
         mainCam.gameObject.SetActive(false);
+
+        if(!isLocalPlayer)
+        {
+            for(int i = 0; i< playerRenderer.materials.Length; i++) //accessing all materials instantiated on the element
+            {
+                playerRenderer.materials[i].color = playerColors[i]; // change non-local player's color
+            }
+
+        }
     }
+
+
 
     //only calling this on local player and not run on any other clients
     public override void OnStartLocalPlayer()

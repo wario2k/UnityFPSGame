@@ -19,10 +19,10 @@ public class PlayerHealth : NetworkBehaviour
             return;
         }
         health -= damage;
-        print("damage recieved");
+        print("damage recieved"); 
         if(health <=0)
         {
-
+           
         }
     }
 }
