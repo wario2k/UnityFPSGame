@@ -66,6 +66,7 @@ public class FPSPlayerAnimations : NetworkBehaviour
     {
         anim.SetTrigger(DEATH);
         networkAnim.SetTrigger(DEATH);
+        //add comments
         StartCoroutine(LoadEndScene());
         //call change scene function here
     }

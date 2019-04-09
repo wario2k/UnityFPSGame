@@ -444,19 +444,11 @@ public class FPSController : NetworkBehaviour //for network controls
     {
         if(playerHealth.health <= 1)
         {
-            //handle death animation here
-            print("Playing death scene");
-            playerAnimation.Death();
-            
 #pragma warning disable CS0618 
-            NetworkManager.singleton.ServerChangeScene("EndScene");
-
+           
             //destroy player from game
             Destroy(playerHolder, 1f);
             Destroy(weaponsHolder, 1f);
-
-          
-
 
         }
         playerAnimation.Movement(charController.velocity.magnitude);
