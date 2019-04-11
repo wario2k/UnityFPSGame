@@ -442,13 +442,11 @@ public class FPSController : NetworkBehaviour //for network controls
     /// </summary>
     void HandleAnimations()
     {
-        if(playerHealth.health <= 1)
+        if(playerHealth.isDead())
         {
-#pragma warning disable CS0618 
-           
-            //destroy player from game
-            Destroy(playerHolder, 1f);
-            Destroy(weaponsHolder, 1f);
+            Debug.Log("Playing Death Scene From Player Controller!");
+            playerAnimation.Death();
+            FindObjectOfType<GameManager>().EndGame();
 
         }
         playerAnimation.Movement(charController.velocity.magnitude);
