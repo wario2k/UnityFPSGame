@@ -9,7 +9,7 @@ public class CursorController : MonoBehaviour
   
     void Start()
     {
-       Cursor.lockState = CursorLockMode.Locked;
+       Cursor.lockState = CursorLockMode.None;
     }
 
     // Update is called once per frame
@@ -32,7 +32,7 @@ public class CursorController : MonoBehaviour
             }
             else //lock the cursor 
             {
-                Cursor.lockState = CursorLockMode.None;
+                Cursor.lockState = CursorLockMode.Locked;
             }
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class FPSController : NetworkBehaviour //for network controls
 {
@@ -55,6 +56,8 @@ public class FPSController : NetworkBehaviour //for network controls
     public Renderer playerRenderer;
 
     private PlayerHealth playerHealth;
+
+    public bool isEnd = false;
 
     //reference for weapons 
     [SerializeField]
@@ -189,7 +192,16 @@ public class FPSController : NetworkBehaviour //for network controls
     }
 
 
+    public override void OnNetworkDestroy()
+    {
 
+        SceneManager.LoadSceneAsync(2);
+    }
+
+    private void OnDisconnectedFromServer( )
+    {
+        SceneManager.LoadSceneAsync(2);
+    }
     //only calling this on local player and not run on any other clients
     public override void OnStartLocalPlayer()
     {
@@ -199,8 +211,15 @@ public class FPSController : NetworkBehaviour //for network controls
     // Update is called once per frame
     void Update()
     {
+        if(isEnd)
+        {
+            //load new scene
+            Debug.Log("Changing Scene");
+            FindObjectOfType<GameManager>().EndGame();
+            //testing destroy functionality
+        }
         //updating so that local camera perspective is used instead of server player
-        if(isLocalPlayer)
+        if (isLocalPlayer)
         {
             if(!mainCam.gameObject.activeInHierarchy)
             {
@@ -446,8 +465,13 @@ public class FPSController : NetworkBehaviour //for network controls
         {
             Debug.Log("Playing Death Scene From Player Controller!");
             playerAnimation.Death();
-            FindObjectOfType<GameManager>().EndGame();
 
+            //load new scene
+            Debug.Log("Changing Scene");
+            FindObjectOfType<GameManager>().EndGame();
+            isEnd = true;
+            Debug.Log("Set End True");
+           
         }
         playerAnimation.Movement(charController.velocity.magnitude);
         playerAnimation.PlayerJump(charController.velocity.y);
