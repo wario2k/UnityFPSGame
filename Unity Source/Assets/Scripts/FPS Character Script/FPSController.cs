@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -28,7 +27,7 @@ public class FPSController : NetworkBehaviour //for network controls
     private bool limitDiagonalSpeed = true;
 
     private float antiBumpFactor = 0.75f;
-
+    //gets player character controller
     private CharacterController charController;
     private Vector3 moveDirection = Vector3.zero;
 
@@ -48,7 +47,7 @@ public class FPSController : NetworkBehaviour //for network controls
 
     //color vars to render player models in different colors 
     private Color[] playerColors = {
-                                                    new Color(0,44,255,255), //blue
+                                                    new Color(255,195,0,255), //orange-yellow
                                                     new Color(252,208,193,255), //red
                                                     new Color(0,0,0,255) //black
                                                     };
@@ -118,25 +117,7 @@ public class FPSController : NetworkBehaviour //for network controls
         //testing to apply appropriate masking for views
         if (isLocalPlayer)
         {
-            //need to check if local player
-            playerHolder.layer = LayerMask.NameToLayer("Player");
-
-            foreach (Transform child in playerHolder.transform)//getting all child objects of the player holder
-            {
-                child.gameObject.layer = LayerMask.NameToLayer("Player");
-            }
-
-            for(int i = 0; i<weapons_FPS.Length; i++)
-            {
-                weapons_FPS[i].layer = LayerMask.NameToLayer("Player");
-            }
-            weaponsHolder.layer = LayerMask.NameToLayer("Enemy");
-
-            foreach(Transform child in weaponsHolder.transform) //getting all child objects of the weapons holder
-            {
-                child.gameObject.layer = LayerMask.NameToLayer("Enemy"); //updating appropriate views
-            }
-
+            makeLocalPlayerUpdates();
         }
 
         //if the palyer is not local 
@@ -144,26 +125,7 @@ public class FPSController : NetworkBehaviour //for network controls
         //update playerHolder layer to enemy layer to hide the fps camera object that contains the extra hands for perspective
         if (!isLocalPlayer)
         {
-
-            playerHolder.layer = LayerMask.NameToLayer("Enemy");
-
-            foreach (Transform child in playerHolder.transform)//getting all child objects of the player holder
-            {
-                child.gameObject.layer = LayerMask.NameToLayer("Enemy");
-            }
-
-            for (int i = 0; i < weapons_FPS.Length; i++)
-            {
-                weapons_FPS[i].layer = LayerMask.NameToLayer("Enemy");
-            }
-
-            weaponsHolder.layer = LayerMask.NameToLayer("Player");
-
-            foreach (Transform child in weaponsHolder.transform) //getting all child objects of the weapons holder
-            {
-                child.gameObject.layer = LayerMask.NameToLayer("Player"); //updating appropriate views
-            }
-
+            makeNonLocalPlayerViewChanges();
         }
 
         //update mouse look for local/non-local players
@@ -183,13 +145,64 @@ public class FPSController : NetworkBehaviour //for network controls
 
         if(!isLocalPlayer)
         {
-            for(int i = 0; i< playerRenderer.materials.Length; i++) //accessing all materials instantiated on the element
-            {
-                playerRenderer.materials[i].color = playerColors[i]; // change non-local player's color
-            }
-
+            changePlayerColor();
         }
     }
+
+
+    public void changePlayerColor()
+    {
+        for (int i = 0; i < playerRenderer.materials.Length; i++) //accessing all materials instantiated on the element
+        {
+            playerRenderer.materials[i].color = playerColors[i]; // change non-local player's color
+        }
+    }
+
+    public void makeLocalPlayerUpdates()
+    {
+        //need to check if local player
+        playerHolder.layer = LayerMask.NameToLayer("Player");
+
+        foreach (Transform child in playerHolder.transform)//getting all child objects of the player holder
+        {
+            child.gameObject.layer = LayerMask.NameToLayer("Player");
+        }
+
+        for (int i = 0; i < weapons_FPS.Length; i++)
+        {
+            weapons_FPS[i].layer = LayerMask.NameToLayer("Player");
+        }
+        weaponsHolder.layer = LayerMask.NameToLayer("Enemy");
+
+        foreach (Transform child in weaponsHolder.transform) //getting all child objects of the weapons holder
+        {
+            child.gameObject.layer = LayerMask.NameToLayer("Enemy"); //updating appropriate views
+        }
+    }
+
+    public void makeNonLocalPlayerViewChanges()
+    {
+        playerHolder.layer = LayerMask.NameToLayer("Enemy");
+
+        foreach (Transform child in playerHolder.transform)//getting all child objects of the player holder
+        {
+            child.gameObject.layer = LayerMask.NameToLayer("Enemy");
+        }
+
+        for (int i = 0; i < weapons_FPS.Length; i++)
+        {
+            weapons_FPS[i].layer = LayerMask.NameToLayer("Enemy");
+        }
+
+        weaponsHolder.layer = LayerMask.NameToLayer("Player");
+
+        foreach (Transform child in weaponsHolder.transform) //getting all child objects of the weapons holder
+        {
+            child.gameObject.layer = LayerMask.NameToLayer("Player"); //updating appropriate views
+        }
+
+    }
+
 
 
     public override void OnNetworkDestroy()

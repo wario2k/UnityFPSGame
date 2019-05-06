@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: 
     guid: 00000000000000000000000000000000
   - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: d99b2ecc5e7d645328bbcde317767d2a
+  - enabled: 1
     path: Assets/Scenes/IceWorld.unity
     guid: 9992af22750f84921b020cb11c2c1035
   - enabled: 1

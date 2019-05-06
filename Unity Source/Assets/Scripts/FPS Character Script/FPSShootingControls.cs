@@ -15,7 +15,8 @@ public class FPSShootingControls : NetworkBehaviour
     [SerializeField]
     private GameObject concrete_Impact, blood_Impact;
 
-    public float damageAmount = 15f;
+    public float damageAmount = 33.33f;
+
     // Start is called before the first frame update
     void Start()
     {
