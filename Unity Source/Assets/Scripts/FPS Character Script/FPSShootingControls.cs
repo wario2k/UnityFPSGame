@@ -1,8 +1,27 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-using UnityEngine.Networking; 
+using UnityEngine.Networking;
+
+/* *
+   CLASS NAME
+
+          FPSShootingControls : NetworkBehaviour
+                       
+    DESCRIPTION
+
+          This class handles all shooting controls for the game. 
+          If the player shoots an object, proper animations need to be played.         
+
+          This class inherits from Network Behavior as we need to sync shooting animations and interactions over the network.
+                   
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            1:37pm 4/12/2019  
+ * */
 
 public class FPSShootingControls : NetworkBehaviour
 {
@@ -12,23 +31,99 @@ public class FPSShootingControls : NetworkBehaviour
     private float fireRate = 15f;
     private float nextTimeToFire = 0f;
 
+    //getting objects to render when an object is hit. 
     [SerializeField]
     private GameObject concrete_Impact, blood_Impact;
 
     public float damageAmount = 33.33f;
 
-    // Start is called before the first frame update
+
+
+    /* *
+    NAME
+
+         void Start() - called to cache reference to the main camera.
+                       
+    DESCRIPTION
+
+         This function gets called before the first update. 
+         The reference to the main camera is acquired bby going through the FPS View in the gameObject as it is a child of that object and the attach it to the 
+         reference in this class
+                   
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            1:37pm 4/12/2019 
+                      
+ * */
     void Start()
     {
         mainCamera = transform.Find("FPS View").Find("FPS Camera").GetComponent<Camera>();
     }
 
-    // Update is called once per frame
-    //This function will only call shoot since we are using this to update the shooting animations and updating the scene using RayCasting to display hits on objects
+
+
+
+    /* *
+
+    NAME
+
+          void Update() - Update is called once per frame
+                       
+    DESCRIPTION
+
+          This function will only call shoot since we are using this to update the shooting 
+          animations and updating the scene using RayCasting to display hits on objects
+
+                   
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            1:37pm 4/12/2019  
+                      
+ * */
+
     void Update()
     {
         Shoot();
     }
+
+
+    /* *
+
+    NAME
+
+          public void Shoot() - shoots gun on mouse click
+                       
+    DESCRIPTION
+
+          This function restricts the rate of fire and plays necessary animations.
+          When the player clicks the right mouse button, the shooting animation is triggered. 
+          When an object is shot, RayCasting is used to determine the point of impact.
+          Once the point of impact is determined, if the point is not an enemy player, the concrete shot animations is played at that point,
+          to demonstrate where the shot was fired.
+          If the point of impact was an enemy player, the player gets hit and it renders a tiny blood splatter animation.
+          This is also used to deal damage to the player.
+                  
+    Returns
+        
+        Nothing      
+                   
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            1:37pm 4/12/2019  
+                      
+ * */
 
     public void Shoot()
     {
@@ -55,23 +150,55 @@ public class FPSShootingControls : NetworkBehaviour
             }
         }
     }
-    /// <summary>
-    /// Deals damage to the player hit using the server to manage health state and not rely on client to manage inidividual health states
-    /// </summary>
-    /// <param name="obj">Game object reference</param>
-    /// <param name="pos">Position of impact</param>
-    /// <param name="rotation">Normal from point of impact.</param>
-    [Command] //can be put on methods from network behavior and allow them to be invoked on the server from the client 
+
+    /* *
+
+    NAME
+
+          void CmdDealDamage(GameObject obj,Vector3 pos, Vector3 rotation) - Deals damage to the player over the network and gets point of impact.
+    
+    SYNOPSIS
+
+        void CmdDealDamage(GameObject obj,Vector3 pos, Vector3 rotation)
+        GameObject obj   - reference to the object that was just hit
+        Vector3 pos      - position of the point of impact.
+        Vector3 rotation - Normal from point of impact.</param>
+                           
+    DESCRIPTION
+
+          This function allows the server to handle dealing damage to the player over the network to make sure all the health values are synced.
+          It also uses the point of impact to generate the blood splatter animation since we want to see some feed back when the player is shot. 
+
+        [Command] - Commands are sent from player objects on the client to player objects on the server. This enables to server to recognize updates.
+
+        For security, Commands can only be sent from YOUR player object
+        so you cannot control the objects of other players. To make a function into a command, 
+        we have to add the [Command] custom attribute to it, and add the “Cmd” prefix. 
+        This function will now be run on the server when it is called on the client. Any arguments will automatically be passed to the server with the command.
+
+        Commands functions must have the prefix “Cmd”. 
+        This is a hint when reading code that calls the command - this function is special and is not invoked locally like a normal function.
+
+
+   Returns
+        
+        Nothing      
+                   
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            1:37pm 4/12/2019  
+                      
+ * */
+    [Command] 
     void CmdDealDamage(GameObject obj,Vector3 pos, Vector3 rotation)
     {
         obj.GetComponent<PlayerHealth>().TakeDamage(damageAmount);
         Instantiate(blood_Impact, pos, Quaternion.LookRotation(rotation));
     }
 
-    [Command]
-    public void CmdEndGame(string level)
-    {
-        NetworkManager.singleton.ServerChangeScene(level);
-    }
 
 }

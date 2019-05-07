@@ -1,6 +1,24 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+
+/* *
+   CLASS NAME
+
+          FPSMouseLook : MonoBehavior 
+                       
+    DESCRIPTION
+
+          This class handles and limits the amount of rotation that the player is allowed to do in game 
+          to make sure camera movements are smooth and not choppy and don't exceed 360 degrees in the x-axis and 60 degrees in the y-axis. 
+                  
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            2:37pm 3/12/2019  
+ * */
 
 public class FPSMouseLook : MonoBehaviour
 {
@@ -36,32 +54,99 @@ public class FPSMouseLook : MonoBehaviour
 
     private float mouseSensitivity = 1.7f;
 
-    // Start is called before the first frame update
+    /*
+     NAME
+
+            void OnStart() - Start is called on the frame when a script is enabled just 
+                             before any of the Update methods are called the first time. 
+                       
+    DESCRIPTION
+
+          Using On start to cache the original rotation factor in order to not have to try to collect that information for every update.
+                       
+    RETURNS
+
+           Nothing.
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            7:37pm 3/12/2019  
+     * */
+
+
     void Start()
     {
         //getting current rotation threshold for the rotation object
         originalRotation = transform.rotation;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
-    //This function can be called depending on thresholds set in unity 
-    void FixedUpdate()
-    {
+    /**/
+    /*
+     NAME
 
-    }
+            void LateUpdate() - LateUpdate is called after all Update functions have been called. This is useful to order script execution. 
+                       
+    DESCRIPTION
 
-    //called to perform final updates 
+           The handle rotation function is being called in the late update inorder to prevent 
+           the user from performing un-conventional rotations making the game look unrealistic. 
+           Limiting the angle of rotation was important in order for the model's integrity to be maintained. 
+                       
+    RETURNS
+
+           Nothing.
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            6:37pm 3/12/2019  
+     * */
     void LateUpdate()
     {
         HandleRotation();
     }
 
-    //this function will place restrictions on the level of rotation allowed 
+
+    /**/
+    /*
+     float ClampAngle(float angle, float minimum, float maximum)
+       
+    NAME
+
+             float ClampAngle(float angle, float minimum, float maximum) -  this function will place restrictions on the level of rotation allowed  
+
+    SYNOPSIS
+            float ClampAngle(float angle, float minimum, float maximum)
+                float angle - the angle the use is trying to look in
+                float minimum - the minimum degree of rotation that would not cause bad scene interactions.
+                float maximum - the maximum degree of rotation that would not cause bad scene interactions.              
+    DESCRIPTION
+
+            This value takes in the angle provided and makes sure it is within an acceptable max and min range. 
+                       
+
+    RETURNS
+
+           Nothing.
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            6:37pm 3/12/2019
+
+    */
+
     float ClampAngle(float angle, float minimum, float maximum)
     {
 
@@ -78,7 +163,38 @@ public class FPSMouseLook : MonoBehaviour
         return Mathf.Clamp(angle, minimum, maximum);
     }
 
-    //this function will be called to maintain desired mouse sensitivity 
+
+    /**/
+    /*
+    void HandleRotation()
+       
+    NAME
+
+            void HandleRotation() - this function will be called to maintain desired mouse sensitivity 
+
+    SYNOPSIS
+            void HandleRotation()
+    DESCRIPTION
+
+            This function checks current mouse sensitivity and tries to regulate how quickly the mouse moves in the scene.
+            If the sensitivity is above the specified threshold, it clamps the value down or up to match the sensitivity we want.
+            This sensitivity was determined using a lot of trial and error to get the most seemles experience. 
+                       
+
+    RETURNS
+
+           Nothing.
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            6:27pm 3/12/2019
+
+    */
+
     void HandleRotation()
     {
         //check current sensitivity 

@@ -3,8 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using UnityEngine.Networking; //for using networkbehavoir
-using UnityEngine.SceneManagement;
 
+/* *
+   CLASS NAME
+
+          FPSPlayerAnimations : NetworkBehaviour
+                       
+    DESCRIPTION
+
+          This class handles all animations to be played in the game.
+          The animations are played by setting triggers, which are then handled by the Animation Controller in Unity which is attached to the player object.        
+
+          This class inherits from Network Behavior as we need to sync all animations over the network.
+          We need to set triggers in the client and over the network as well to make sure animations are synced over the network
+          so that animations on one player are seen by the other player.
+                   
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            1:37pm 4/12/2019  
+ * */
 public class FPSPlayerAnimations : NetworkBehaviour
 {
 
@@ -33,7 +54,34 @@ public class FPSPlayerAnimations : NetworkBehaviour
     //required to sync triggers and play animations over the network 
     private NetworkAnimator networkAnim;
 
-    //caled like start when game is initiated 
+   
+
+
+    /* *
+
+    NAME
+
+          void Start() - called when the scene is loaded
+                       
+    DESCRIPTION
+
+          This function handles caching as we want to be able to get reference to the network and local animator components.
+          The references then allow us to set the appropriate triggers to play animations in the scene.         
+                  
+    Returns
+        
+        Nothing      
+                   
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            1:37pm 4/12/2019  
+                      
+ * */
+
     private void Awake()
     {
         //getting animator object from the game state
@@ -41,60 +89,209 @@ public class FPSPlayerAnimations : NetworkBehaviour
         networkAnim = GetComponent<NetworkAnimator>();
 
     }
-    /// <summary>
-    /// Movement acc to specified magnitude.
-    /// </summary>
-    /// <param name="magnitude">velocity of the game object.</param>
+
+    /* *
+
+    NAME
+
+           public void Movement(float magnitude) - sets the movement trigger
+    
+    SYNOPSIS         
+                 public void Movement(float magnitude) - sets the movement trigger
+                   
+                 float magnitude -> velocity in the x direction acquired from the scene.                
+    DESCRIPTION
+    
+        This function sets the Magnitude trigger which is one of the several triggers in the animation controller in unity. 
+        This is the speed the player is currently moving in the scene.
+        Depending on your speed, the animations that are played are different.      
+          
+    Returns
+        
+        Nothing      
+                   
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            1:37pm 4/12/2019  
+                      
+ * */
+
     public void Movement(float magnitude)
     {
         anim.SetFloat(MOVE, magnitude); 
     }
 
-    /// <summary>
-    /// Player decides to jump this needs to update the animation
-    /// </summary>
-    /// <param name="velocity">Velocity in the y direction </param>
+
+    /* *
+
+     NAME
+
+            public void PlayerJump(float velocity) - playing the jumping animation 
+
+     SYNOPSIS         
+                  public void PlayerJump(float velocity)
+
+                  float velocity -> velocity in the y direction acquired from the scene.                
+     DESCRIPTION
+
+         This function sets the VELOCITY_Y trigger which is one of the several triggers in the animation controller in unity. 
+         This is value is updated when the players momentum in the Y axis changes i.e the player is trying to jump. 
+         If a certain threshold is met, the player moves up in the Y-axis while playing the jumping animation.
+        
+     Returns
+
+         Nothing      
+
+     AUTHOR
+
+             Aayush B Shrestha
+
+     DATE
+
+             3:37pm 4/12/2019  
+
+  * */
+
     public void PlayerJump(float velocity)
     {
         anim.SetFloat(VELOCITY_Y, velocity);
     }
 
-    /// <summary>
-    /// play the animation for player dying.
-    /// </summary>
+    /* *
+
+    NAME
+
+           public void Death() - plays the dying animation
+
+             
+    DESCRIPTION
+
+        This function sets the DEATH trigger which is one of the several triggers in the animation controllers that I implemented. 
+        This is called when the player's health goes below 1f and plays the death animation.
+
+    Returns
+
+        Nothing      
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            3:37pm 4/12/2019  
+
+ * */
     public void Death()
     {
         anim.SetTrigger(DEATH);
         networkAnim.SetTrigger(DEATH);
-        //add comments
-        //StartCoroutine(LoadEndScene());
-        //call change scene function here
+
     }
 
-    /// <summary>
-    /// Update player stance to go to crouching position.
-    /// </summary>
-    /// <param name="isCrouching">Is crouching is a flag that the player object has and is set to true if the player wants to crouch</param>
+
+    /* *
+
+    NAME
+
+            public void PlayerCrouch(bool isCrouching) - change the players orientation to be crouching.
+    
+    SYNOPSIS
+            public void PlayerCrouch(bool isCrouching) - change the players orientation to be crouching.
+
+            bool isCrouching - flag to determine whether or not the player is crouching
+    DESCRIPTION
+
+       This function determines when to change the player's posture to be crouching. If the flag is set to true the player's position is changed from standing to crouching.
+
+    Returns
+
+        Nothing      
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            3:37pm 4/12/2019  
+
+ * */
     public void PlayerCrouch(bool isCrouching)
     {
         anim.SetBool(CROUCH, isCrouching);
     }
 
-    /// <summary>
-    /// This method handles the player moving in crouched stance 
-    /// Speed is reduced since walking speed > crouch speed. 
-    /// </summary>
-    /// <param name="magnitude">magnitude of movement pulled from the game object</param>
+
+    /* *
+
+    NAME
+
+            public void PlayerCrouchWalk(float magnitude) - limit speed if the player is moving while crouched 
+    
+    SYNOPSIS
+            public void PlayerCrouchWalk(float magnitude)
+                      
+            bool magnitude - velocity of the player in the x-direction 
+                      
+    DESCRIPTION
+
+      This function plays the animation  of the player if the player is moving while crouched 
+      so that the crouching player is not as fast as a standing player.
+      The CROUCH_WALK trigger is set to start playing the crouch-walk animation in the scene.
+          
+    Returns
+
+        Nothing      
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            3:37pm 4/12/2019  
+
+ * */
+
     public void PlayerCrouchWalk(float magnitude)
     {
         anim.SetFloat(CROUCH_WALK, magnitude);
     }
-   
 
-    /// <summary>
-    /// This function will handle animations for shooting depending on stand/crouch positions 
-    /// </summary>
-    /// <param name="isStanding">If set to <c>true</c> is standing.</param>
+
+    /* *
+
+        NAME
+
+                public void Shoot(bool isStanding)
+
+        SYNOPSIS
+                public void Shoot(bool isStanding)
+
+                bool isStanding - is true if the player is standing
+
+        DESCRIPTION
+
+        This function will handle animations for shooting depending on whether the player is standing or crouching.
+
+        Returns
+
+            Nothing      
+
+        AUTHOR
+
+                Aayush B Shrestha
+
+        DATE
+
+                3:37pm 4/13/2019  
+
+     * */
     public void Shoot(bool isStanding)
     { 
         if(isStanding)
@@ -112,9 +309,32 @@ public class FPSPlayerAnimations : NetworkBehaviour
             networkAnim.SetTrigger(CROUCH_SHOOT);
         }
     }
-    /// <summary>
-    /// This method will handle the reload animation for the weapon.
-    /// </summary>
+
+    /* *
+
+        NAME
+
+                public void ReloadGun()
+
+
+        DESCRIPTION
+
+        This function will handle animations for Reloading the gun. The trigger is set in the scene to initiate the reloading animation.
+
+        Returns
+
+            Nothing      
+
+        AUTHOR
+
+                Aayush B Shrestha
+
+        DATE
+
+                3:37pm 4/13/2019  
+
+     * */
+
     public void ReloadGun()
     {
         anim.SetTrigger(RELOAD);
@@ -122,10 +342,37 @@ public class FPSPlayerAnimations : NetworkBehaviour
         networkAnim.SetTrigger(RELOAD);
     }
 
-    /// <summary>
-    /// Changes the controller based on what gun the player is currently holding
-    /// </summary>
-    /// <param name="isPistol">Determines if the player is holding a pistol.</param>
+    /* *
+
+      NAME
+
+             public void ChangeController(bool isPistol) - changes the animation controller based on the gun
+      
+      SYNOPSIS
+             
+              public void ChangeController(bool isPistol)       
+              bool isPistol -> determines whether the player is holding a pistol or a rifle.
+
+      DESCRIPTION
+      
+      Changes the controller based on what gun the player is currently holding.
+      There are different ways the animations are being handled depending on the type of gun so this method sets the appropriate controller.        
+     
+
+      Returns
+
+          Nothing      
+
+      AUTHOR
+
+              Aayush B Shrestha
+
+      DATE
+
+              3:37pm 4/13/2019  
+
+   * */
+
     public void ChangeController(bool isPistol)
     {
         if(isPistol)
@@ -138,10 +385,4 @@ public class FPSPlayerAnimations : NetworkBehaviour
         }
     }
 
-
-    IEnumerator LoadEndScene()
-    {
-        yield return new WaitForSeconds(3);
-        SceneManager.LoadScene("EndScene");
-    }
 }

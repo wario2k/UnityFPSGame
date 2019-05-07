@@ -3,6 +3,26 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
+/* *
+   CLASS NAME
+
+          public class FPSController : NetworkBehaviour - inherits from network behavior
+                       
+    DESCRIPTION
+
+          This is the primary controller for the player game object. 
+          This class handles all movement and interactions in the game that the player object is capable of performing.        
+                  
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            2:37pm 3/12/2019  
+ * */
+
 public class FPSController : NetworkBehaviour //for network controls
 {
     private Transform firstPerson_View;
@@ -56,6 +76,8 @@ public class FPSController : NetworkBehaviour //for network controls
 
     private PlayerHealth playerHealth;
 
+    //determines when to load the win screen
+
     public bool isEnd = false;
 
     //reference for weapons 
@@ -76,7 +98,29 @@ public class FPSController : NetworkBehaviour //for network controls
     private WeaponManager handsWeapon_Manager;
     private FPSHandsWeapon current_Hands_Weapon;
 
-    // Start is called before the first frame update
+
+/* *
+    NAME
+
+          void Start() - called before the first update to get all references and cache them
+                       
+    DESCRIPTION
+          
+          Gets all necessary components to handle all player interactions. 
+          Also depending on whether the player is local or non-local, certain views have to be handled so that is also done.
+          For the local player we want to render just the hands in their view and not the main body. 
+          If the player is not local meaning we see an enemy player in the scene, we do not want to have just the hands rendered but also the full body.
+          This is all done at start since this will make sure the correct models are rendered.
+                  
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            2:37pm 2/12/2019  
+ * */
     void Start()
     {
         playerHealth = GetComponent<PlayerHealth>(); //get health component
@@ -150,6 +194,27 @@ public class FPSController : NetworkBehaviour //for network controls
     }
 
 
+
+/* *
+       
+    NAME
+
+          changePlayerColor() -> changes the color of the non-local player 
+                       
+    DESCRIPTION
+          
+          Since we don't want both players to look alike, depending on if the player is not the local player the color of his/her top is changed.
+                  
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            2:37pm 2/12/2019  
+                      
+ * */
     public void changePlayerColor()
     {
         for (int i = 0; i < playerRenderer.materials.Length; i++) //accessing all materials instantiated on the element
@@ -157,6 +222,33 @@ public class FPSController : NetworkBehaviour //for network controls
             playerRenderer.materials[i].color = playerColors[i]; // change non-local player's color
         }
     }
+
+/* *
+
+   NAME
+
+         makeLocalPlayerUpdates() -> change the camera view depending on player
+
+   DESCRIPTION
+
+         The views being rendered in game are dependant on what the current player is.
+         The local player only wants to see the hands while shooting since that is the behavior most FPS games have.
+         In order to achieve this the player model is made in-active in the local player's view.
+
+    RETURNS
+
+        Nothing       
+
+
+   AUTHOR
+
+           Aayush B Shrestha
+
+   DATE
+
+           2:37pm 2/22/2019  
+
+* */
 
     public void makeLocalPlayerUpdates()
     {
@@ -179,6 +271,35 @@ public class FPSController : NetworkBehaviour //for network controls
             child.gameObject.layer = LayerMask.NameToLayer("Enemy"); //updating appropriate views
         }
     }
+
+
+
+/* *
+
+   NAME
+
+         makeNonLocalPlayerViewChanges() -> change the camera view for non-local player
+
+   DESCRIPTION
+
+         This function updates the view for the enemy player. If we are observing an enemy in the game, 
+         we only want to be able to see their player model and not their FPS view. The "Enemy" layer mask indicates
+         that we want to hide the enemy's FPS Camera view so that we don't render an extra set of hands for the enemy player in the game.
+
+    RETURNS
+
+        Nothing       
+
+
+   AUTHOR
+
+           Aayush B Shrestha
+
+   DATE
+
+           2:37pm 2/22/2019  
+
+* */
 
     public void makeNonLocalPlayerViewChanges()
     {
@@ -204,6 +325,31 @@ public class FPSController : NetworkBehaviour //for network controls
     }
 
 
+/* *
+
+   NAME
+
+         public override void OnNetworkDestroy() - called when the server player is killed 
+                
+   DESCRIPTION
+
+         If the non-server player kills the host, the server will shutdown. Instead of making the game crash in this case, 
+         we want to switch over to the win scene which will allow the player to either exit the game or play another one.
+         
+    RETURNS
+
+        Nothing       
+
+
+   AUTHOR
+
+           Aayush B Shrestha
+
+   DATE
+
+           2:37pm 2/22/2019  
+
+* */
 
     public override void OnNetworkDestroy()
     {
@@ -211,17 +357,95 @@ public class FPSController : NetworkBehaviour //for network controls
         SceneManager.LoadSceneAsync(2);
     }
 
+
+/* *
+
+   NAME
+
+         public override void OnNetworkDestroy() - called when another player disconnects from the server
+                
+   DESCRIPTION
+
+         Since we are only dealing with two players, when one player disconnects from the game after being killed,
+         we want to switch over to the win screen, Which will then allow the player to either quit the game or start a new one.        
+         
+    RETURNS
+
+        Nothing       
+
+
+   AUTHOR
+
+           Aayush B Shrestha
+
+   DATE
+
+           2:37pm 2/22/2019  
+
+* */
+
     private void OnDisconnectedFromServer( )
     {
         SceneManager.LoadSceneAsync(2);
     }
-    //only calling this on local player and not run on any other clients
+
+/* *
+
+  NAME
+
+       public override void OnStartLocalPlayer() - set the tag for player object in game
+
+  DESCRIPTION
+
+        Since the tags are used to render specific views, it is important to set the local player view at start.        
+
+   RETURNS
+
+       Nothing       
+
+
+  AUTHOR
+
+          Aayush B Shrestha
+
+  DATE
+
+          2:37pm 2/22/2019  
+
+* */
+
     public override void OnStartLocalPlayer()
     {
         tag = "Player";
 
     }
-    // Update is called once per frame
+
+/* *
+
+NAME
+
+     void Update () - called once per frame to make necessary updates 
+     
+DESCRIPTION
+
+      Since scripts are shared, we need to make sure a check is being made to ensure only one player is moving when certain
+      actions are being invoked. This is handled once per frame since we don't want the local-player actions affecting the non-local player.
+    
+ RETURNS
+
+     Nothing       
+
+
+AUTHOR
+
+        Aayush B Shrestha
+
+DATE
+
+        4:37pm 2/22/2019  
+
+* */
+
     void Update()
     {
         if(isEnd)
@@ -254,12 +478,31 @@ public class FPSController : NetworkBehaviour //for network controls
 
     }
 
+    /* *
 
+    NAME
 
-    /// <summary>
-    /// This function determines what direction the player wants to move in based on 
-    /// the allowed set of key presses W,A,S,D 
-    /// </summary>
+         void  void PlayerMovement() - moves the player based on keyboard input
+    DESCRIPTION
+             
+        This function determines what direction the player wants to move in based on 
+        the allowed set of key presses W,A,S,D.
+        Depending on the movement of the player, camera and rotation angles are also adjusted for smooth transitions in the scene.       
+
+     RETURNS
+
+         Nothing       
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            4:37pm 2/22/2019  
+
+    * */
+
     void PlayerMovement()
     {
         //if w or s pressed the player has decided to move forward if W and backward if S 
@@ -352,7 +595,32 @@ public class FPSController : NetworkBehaviour //for network controls
     }
 
 
-    //if player is not crouched and presses 'C' crouch and if can stand again or is no longer pressing c, stand upright again.
+    /* *
+
+    NAME
+
+         void PlayerCrouchingAndSprinting() - Handles crouching action
+                
+    DESCRIPTION
+             
+        This function determines if the player can crouch or stand up from crouching postion when the "c" key is hit.
+        Camera view and animation is updated to reflect the position of the player since the crouching view would be lower than the standing view.
+        The movement speed is also restricted based on player's orientation. If player goes from a sprint to a crouch, we want to lower his speed.      
+
+     RETURNS
+
+         Nothing       
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            4:37pm 2/22/2019  
+
+    * */
+
     void PlayerCrouchingAndSprinting()
     { 
         if(Input.GetKey(KeyCode.C))
@@ -396,6 +664,31 @@ public class FPSController : NetworkBehaviour //for network controls
     }
 
 
+    /* *
+
+    NAME
+
+         bool CanGetUp() - determines if the player is crouching
+                
+    DESCRIPTION
+             
+        This function determines if the player is in a crouched position. This is determined using a raycast. We don't want to abruptly 
+        cancel crouching animation so we want to set the can get up flag to false until the animation is complete.
+
+     RETURNS
+
+         True if completely crouched else False.      
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            4:37pm 2/22/2019  
+
+    * */
+
     bool CanGetUp()
     {
         //where we are casting the ray from 
@@ -422,6 +715,32 @@ public class FPSController : NetworkBehaviour //for network controls
         return true;
     }
 
+
+    /* *
+
+    NAME
+
+         IEnumerator MoveCameraCrouch() - handles camera transition for crouching
+                
+    DESCRIPTION
+             
+        This function handles the updating of camera postion when changing orientation from standing to crouching.
+        This is called inside of a couroutine to ensure smooth transition.      
+
+     RETURNS
+
+         yield return - yeilds until the action has finished executing      
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            4:37pm 2/22/2019  
+
+    * */
+
     IEnumerator MoveCameraCrouch()
     {
         //if player is crouching set lower the height to make them crouch 
@@ -443,9 +762,32 @@ public class FPSController : NetworkBehaviour //for network controls
 
     }
 
-    //method to handle player jumping
-    //if player is crouched stand up
-    //else player will jump
+    /* *
+
+    NAME
+
+         void PlayerJump() - handles player jumping
+                
+    DESCRIPTION
+             
+        This function handles updating all actions for the player jumping when pressing the "space bar". 
+        When jumping velocity in the y-axis needs to be updated and the camera needs to be checked to ensure 
+        we are not in the air directly from a croiuching position.       
+
+     RETURNS
+
+         Nothing     
+
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            6:37pm 2/22/2019  
+
+    * */
+
     void PlayerJump()
     {
         if(Input.GetKey(KeyCode.Space))
@@ -469,21 +811,39 @@ public class FPSController : NetworkBehaviour //for network controls
         }
     }
 
-    /// <summary>
-    /// Handles the animations in the game object.
-    /// </summary>
+    /* *
+
+   NAME
+
+        void HandleAnimations() - handles player animations in scene
+
+   DESCRIPTION
+
+       This function handles updating all animations for the player in game.Handles movement, camera rotation, shooting and reloading animations 
+       and triggers appropriate animations for each action. The velocity of the player is acquired from the scene.      
+
+    RETURNS
+
+        Nothing     
+
+   AUTHOR
+
+           Aayush B Shrestha
+
+   DATE
+
+           6:37pm 2/22/2019  
+
+   * */
+
     void HandleAnimations()
     {
         if(playerHealth.isDead())
         {
             Debug.Log("Playing Death Scene From Player Controller!");
             playerAnimation.Death();
-
-            //load new scene
-            Debug.Log("Changing Scene");
             FindObjectOfType<GameManager>().EndGame();
             isEnd = true;
-            Debug.Log("Set End True");
            
         }
         playerAnimation.Movement(charController.velocity.magnitude);
@@ -526,10 +886,37 @@ public class FPSController : NetworkBehaviour //for network controls
         }
     }
 
-    /// <summary>
-    /// Activates the weapon in the player layer.
-    /// </summary>
-    /// <param name="index">Index of weapon to activate</param>
+
+
+    /* *
+
+   NAME
+
+        void activatePlayerLayerWeapon(int index) - enables player view for weapons
+
+   SYNOPSIS
+     void activatePlayerLayerWeapon(int index) 
+        int index - index of weapon to be activated   
+
+   DESCRIPTION
+
+       This function handles changing in game rendering of weapons to display only the primary weapon and hide all other weapons from the scene when initially loading in.
+       This makes sure we don't have the player holding multiple weapons simultaneously, when loading into the scene.
+            
+    RETURNS
+
+        Nothing     
+
+   AUTHOR
+
+           Aayush B Shrestha
+
+   DATE
+
+           9:37pm 2/23/2019  
+
+   * */
+
     void activatePlayerLayerWeapon(int index)
     {
         //if weapon isn't already selected, deactivates all other weapons in model and sets the selected weapon as active 
@@ -547,12 +934,33 @@ public class FPSController : NetworkBehaviour //for network controls
         }
     }
 
-    /// <summary>
-    /// This function will handle changing weapons any time the player decides
-    /// </summary>
+    /* *
+
+   NAME
+
+        void SelectWeapon() - handles switching of weapons
+
+   DESCRIPTION
+
+       This function handles changing in game rendering of weapons ensure when the player switches a weapon, that is set to active
+       and all the other weapons in the heirarchy are disabled. This makes sure we don't have a player holding multiple weapons with the same hand.
+       There also needs to be a check for the type of weapon, since loading the weapon animation is different for pistols and rifles.    
+            
+    RETURNS
+
+        Nothing     
+
+   AUTHOR
+
+           Aayush B Shrestha
+
+   DATE
+
+           9:37pm 2/23/2019  
+
+   * */
     void SelectWeapon()
     {
-
 
         //if player selects 1 select pistol
         if(Input.GetKeyDown(KeyCode.Alpha1))
