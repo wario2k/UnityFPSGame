@@ -4,13 +4,62 @@ using UnityEngine;
 
 using UnityEngine.Networking;
 
-//custom network manager
+/* *
+   CLASS NAME
+
+          NetManager : NetworkManager
+                       
+    DESCRIPTION
+
+         This is a custom network manager that handles launching and handling LAN servers for the players in game to be able to connect to and create new servers.
+                   
+    AUTHOR
+
+            Aayush B Shrestha
+
+    DATE
+
+            2:37pm 4/12/2019  
+                       
+ * */
+
 public class NetManager : NetworkManager
 {
 
     private bool firstPlayerJoined;
-    //when player is about to spawn the palyer
-    //we will control where we spawn the player
+
+
+    /* *
+
+    NAME
+
+      public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
+
+    SYNOPSIS
+
+        public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
+            NetworkConnection conn      - incoming connection 
+            short playerControllerId    - id of the incoming player
+
+    DESCRIPTION
+
+        This function overrides the OnServerAddPlayer method to spawn players in a list of specified spawn locations instead of dropping them
+        in random parts of the map which could potentially lead to unexpected behavior.
+
+    RETURNS
+
+      Nothing     
+
+    AUTHOR
+
+         Aayush B Shrestha
+
+    DATE
+
+         9:37pm 2/23/2019  
+
+    * */
+
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
     {
         GameObject playerObj = Instantiate(playerPrefab);
@@ -28,9 +77,35 @@ public class NetManager : NetworkManager
 
         NetworkServer.AddPlayerForConnection(conn, playerObj, playerControllerId);
     }
-    /// <summary>
-    /// Sets the port and address for servers.
-    /// </summary>
+
+/* *
+
+    NAME
+
+      void SetPortAndAddress()
+
+    SYNOPSIS
+
+        void SetPortAndAddress()
+
+    DESCRIPTION
+
+        This function sets the port and address for servers.
+
+    RETURNS
+
+      Nothing     
+
+    AUTHOR
+
+         Aayush B Shrestha
+
+    DATE
+
+         9:37pm 2/23/2019  
+
+* */
+
     void SetPortAndAddress()
     {
         //setting default port
@@ -38,20 +113,69 @@ public class NetManager : NetworkManager
         singleton.networkAddress = "localhost";
     }
 
-    /// <summary>
-    /// Attached to Host game button on UI 
-    /// will start a new server instance
-    /// </summary>
+/* *
+
+    NAME
+
+      void HostGame()
+
+    SYNOPSIS
+
+        void HostGame()
+
+    DESCRIPTION
+
+        This function is attached to Host game button on UI 
+        and will start a new server instance
+
+    RETURNS
+
+      Nothing     
+
+    AUTHOR
+
+         Aayush B Shrestha
+
+    DATE
+
+         9:37pm 2/23/2019  
+
+* */
     public void HostGame()
     {
         SetPortAndAddress();
         singleton.StartHost();
     }
 
-    /// <summary>
-    /// Attached to join game button on UI 
-    /// will connect to hosted server
-    /// </summary>
+/* *
+
+        NAME
+
+          void JoinGame()
+
+        SYNOPSIS
+
+            void JoinGame()
+
+        DESCRIPTION
+
+            This function is Attached to join game button on UI 
+            will connect to hosted server
+
+        RETURNS
+
+          Nothing     
+
+        AUTHOR
+
+             Aayush B Shrestha
+
+        DATE
+
+             9:37pm 2/23/2019  
+
+    * */
+
     public void JoinGame()
     {
         SetPortAndAddress();

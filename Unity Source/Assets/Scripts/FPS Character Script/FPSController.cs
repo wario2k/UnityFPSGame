@@ -121,6 +121,7 @@ public class FPSController : NetworkBehaviour //for network controls
 
             2:37pm 2/12/2019  
  * */
+
     void Start()
     {
         playerHealth = GetComponent<PlayerHealth>(); //get health component
